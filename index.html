@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<!--
+  内部元数据（归属指纹，不影响任何逻辑）
+  一场跨越光年的宇宙旅行；晚安，辰星
+  复制 / 拆解本文件即视为保留此来源标记
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>生日祝福 · 来自朋友们的信</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23b79cf0'/%3E%3Cg stroke='%23fff' stroke-width='5'%3E%3Cpath d='M30 46 L36 26'/%3E%3Cpath d='M50 46 L50 22'/%3E%3Cpath d='M70 46 L64 26'/%3E%3C/g%3E%3Crect x='26' y='48' width='48' height='26' rx='6' fill='%23fff7e8'/%3E%3Crect x='34' y='40' width='10' height='9' rx='3' fill='%23ffb3c7'/%3E%3Crect x='56' y='40' width='10' height='9' rx='3' fill='%23ffb3c7'/%3E%3C/svg%3E">
+<style>
+  /* 内部元数据（归属指纹，不影响任何逻辑）：一场跨越光年的宇宙旅行；晚安，辰星 */
+  :root{
+    --bg1:#ffffff; --bg2:#fdfaf0; --bg3:#fefcf5;
+    --ink:#3a352c; --ink-soft:#5c5648; --muted:#8f8877;
+    --violet:#e8a53a; --violet-deep:#c98e2a; --lav:#f7dfa6; --lav-soft:#fbf0d0;
+    --pink:#efa83f; --gold:#eec75a; --cream:#ffffff;
+    --card:#ffffff; --radius:20px;
+    --shadow:0 10px 26px rgba(200,160,50,.13);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 45%,var(--bg3) 100%);
+    color:var(--ink);line-height:1.7;overflow-x:hidden;
+  }
+  #fx{position:fixed;inset:0;pointer-events:none;z-index:60}
+  .mute{
+    position:fixed;top:14px;right:14px;z-index:70;display:flex;align-items:center;gap:6px;
+    padding:8px 12px;border:none;border-radius:999px;background:rgba(255,255,255,.85);
+    color:var(--ink-soft);font-size:13px;cursor:pointer;box-shadow:var(--shadow);backdrop-filter:blur(6px);min-height:44px;
+  }
+  .mute svg{width:18px;height:18px}
+  .floaties{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .floaties span{position:absolute;color:rgba(200,160,50,.14);animation:float linear infinite}
+  @keyframes float{0%{transform:translateY(110vh) rotate(0);opacity:0}12%{opacity:1}90%{opacity:.9}100%{transform:translateY(-12vh) rotate(35deg);opacity:0}}
+
+  /* ============ 首屏：锁屏 → 播放器 ============ */
+  .hero{
+    position:relative;z-index:1;min-height:100svh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    background:#ffffff;overflow:hidden;
+  }
+  /* 顶部状态栏 */
+  .statusbar{
+    position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
+    align-items:center;padding:20px 24px;color:var(--ink-soft);font-size:14px;font-weight:600;z-index:2;
+  }
+  .statusbar .icons{display:flex;gap:10px;align-items:center}
+  .statusbar .icons svg{width:18px;height:18px}
+  /* 锁屏视图 */
+  .lock{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;width:100%;min-height:100svh;padding:0 20px 44px}
+  .lock .clock{width:100%;text-align:center;margin-bottom:auto;padding-top:9vh}
+  .lock .bigdate{font-size:clamp(15px,4.2vw,20px);color:var(--muted);margin-bottom:6px}
+  .lock .bigtime{font-size:clamp(56px,17vw,96px);font-weight:700;letter-spacing:.02em;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+  .avatarBtn{
+    width:96px;height:96px;border-radius:50%;border:3px solid var(--cream);flex:none;overflow:hidden;
+    background:radial-gradient(circle at 32% 28%,#f6d98a,#e0a83a 72%);
+    box-shadow:0 12px 26px rgba(200,160,50,.28);cursor:pointer;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .2s ease;padding:0;
+  }
+  .avatarBtn:hover{transform:scale(1.05)}
+  .avatarBtn:active{transform:scale(.95)}
+  .avatarBtn .ph{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+  .lock .uname{font-size:clamp(17px,4.5vw,22px);font-weight:700;color:var(--ink);text-align:center;margin-top:14px}
+  .lock .touchhint{font-size:12.5px;color:var(--muted);text-align:center;margin-top:4px}
+  /* 播放器视图 */
+  .player{
+    display:none;flex-direction:column;align-items:center;width:100%;
+    padding:76px 26px 44px;position:relative;
+  }
+  .player.show{display:flex;animation:fadeIn .55s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .vinyl{
+    width:clamp(172px,40vw,230px);height:clamp(172px,40vw,230px);border-radius:50%;
+    position:relative;display:flex;align-items:center;justify-content:center;flex:none;
+    background:radial-gradient(circle at 30% 28%,#5a4a28,#2a2110 55%,#191006 100%);
+    box-shadow:0 16px 34px rgba(30,20,44,.42);
+  }
+  .vinyl.paused{animation-play-state:paused}
+  .vinyl .grooves{position:absolute;inset:0;border-radius:50%;
+    background:repeating-radial-gradient(circle at center,rgba(0,0,0,0) 0 6px,rgba(255,255,255,.055) 6px 7px)}
+  .vinyl .label{
+    width:54%;height:54%;border-radius:50%;background:#ffffff;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);
+  }
+  .vinyl .label .ph{width:100%;height:100%;object-fit:cover;display:block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .vinyl{animation:spin 6s linear infinite}
+  .player .song{margin-top:32px;font-size:clamp(22px,6vw,30px);font-weight:800;color:var(--ink)}
+  .player .artist{font-size:14px;color:var(--muted);margin-top:4px}
+  /* 歌词 */
+  .lyrics{margin-top:20px;height:118px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;position:relative;width:100%;max-width:430px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+  .lyrics::-webkit-scrollbar{display:none}
+  .lyrics .lwrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:4px 0}
+  .lyrics .l{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;color:var(--muted);opacity:.5;transition:all .45s ease;line-height:1.35}
+  .lyrics .l .en{font-size:11px;font-weight:400;opacity:.75}
+  .lyrics .l.act{font-size:17px;color:var(--ink);opacity:1;font-weight:700}
+  /* 进度条 */
+  .progress{width:100%;max-width:430px;margin-top:18px}
+  .progress .bar{height:4px;border-radius:99px;background:rgba(200,160,50,.20);overflow:hidden}
+  .progress .bar i{display:block;height:100%;width:6%;background:linear-gradient(90deg,var(--violet),var(--pink));border-radius:99px;transition:width 1s linear}
+  .progress .tms{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+  /* 控制 */
+  .controls{display:flex;align-items:center;gap:30px;margin-top:14px}
+  .controls .side{width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);border:none;background:none;cursor:pointer}
+  .controls .play{
+    width:62px;height:62px;border-radius:50%;border:none;background:var(--violet-deep);color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 22px rgba(200,160,50,.28);
+    transition:transform .15s ease;
+  }
+  .controls .play:active{transform:scale(.94)}
+  .hero .scrollhint{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:var(--muted);font-size:13px;animation:buoy 1.6s ease-in-out infinite}
+  @keyframes buoy{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  /* ============ 场景区 ============ */
+  .stage{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:36px 16px 30px;text-align:center}
+  .stage .kicker{font-size:13px;letter-spacing:.22em;color:var(--muted);font-weight:600}
+  .stage h2{font-size:clamp(24px,5vw,32px);font-weight:800;margin:8px 0 6px;color:var(--ink)}
+  .stage .sub{color:var(--ink-soft);font-size:15px;margin-bottom:20px}
+  .letSpeak{
+    min-height:50px;padding:0 28px;border:none;border-radius:999px;cursor:pointer;
+    font-size:16px;font-weight:700;color:#fff;margin-bottom:20px;
+    background:linear-gradient(135deg,var(--pink),var(--violet));
+    box-shadow:0 12px 24px rgba(200,160,50,.28);
+  }
+
+  .scene{
+    position:relative;background:rgba(255,255,255,.72);border-radius:28px;
+    padding:22px 16px 20px;box-shadow:var(--shadow);
+  }
+  /* 群像主视觉 */
+  .poster{border-radius:20px;overflow:hidden;box-shadow:var(--shadow);background:#fff}
+  .poster img{display:block;width:100%;height:auto}
+  .poster figcaption{font-size:12px;color:var(--muted);padding:8px 12px 10px;background:#fff}
+  /* 角色一排 */
+  .chars{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:16px auto 6px}
+  .role{
+    display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;
+    border:none;background:none;padding:6px 8px;border-radius:16px;
+    transition:transform .2s ease,background .2s ease;
+  }
+  .role:hover{background:rgba(200,160,50,.08)}
+  .role:active{transform:scale(.94)}
+  .role .ava{
+    width:58px;height:58px;border-radius:50%;object-fit:cover;
+    border:3px solid var(--cream);box-shadow:var(--shadow);
+    transition:box-shadow .2s ease,transform .2s ease;
+  }
+  .role:hover .ava{box-shadow:0 0 0 3px var(--gold),0 8px 18px rgba(200,160,50,.25);transform:translateY(-2px)}
+  .role.speaking .ava{box-shadow:0 0 0 3px var(--gold),0 8px 18px rgba(200,160,50,.25)}
+  .role .nm{font-size:12px;color:var(--ink-soft)}
+  .role .chip{
+    position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;
+    background:var(--pink);color:#fff;font-size:11px;display:none;align-items:center;justify-content:center;
+  }
+  .role.hasnew .chip{display:flex}
+
+  /* 微信对话框 */
+  .wechat{
+    margin:18px auto 4px;max-width:560px;background:#fbf8ee;border-radius:18px;
+    border:1px solid rgba(200,160,50,.16);overflow:hidden;text-align:left;
+  }
+  .wechat-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:11px 16px;background:var(--violet-deep);color:#fff;font-weight:700;font-size:14px;
+  }
+  .wechat-head .cnt{font-weight:400;font-size:12px;opacity:.85}
+  .wechat-head .clearBtn{margin-left:auto;background:rgba(255,255,255,.16);border:none;color:#fff;font-size:12px;padding:4px 10px;border-radius:99px;cursor:pointer;line-height:1;flex:none}
+  .wechat-head .clearBtn:hover{background:rgba(255,255,255,.28)}
+  .wechat-body{max-height:330px;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:14px}
+  .wechat-body:empty::before{content:"点一点上面的朋友，他们会在这里跟你说话";color:var(--muted);font-size:13px;text-align:center;padding:24px 0}
+  .row{display:flex;gap:10px;opacity:0;transform:translateY(10px);animation:msgIn .45s ease forwards}
+  @keyframes msgIn{to{opacity:1;transform:none}}
+  .row .ava{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;background:#fff}
+  .row.host .ava{width:40px;height:40px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:18px}
+  .row .col{min-width:0}
+  .row .meta{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+  .row .meta b{font-size:13px;color:var(--ink-soft)}
+  .row .meta .tm{font-size:11px;color:var(--muted)}
+  .row .bub{
+    display:inline-block;max-width:82%;background:var(--card);border-radius:4px 14px 14px 14px;
+    padding:9px 13px;font-size:14px;color:var(--ink);line-height:1.55;box-shadow:0 2px 6px rgba(200,160,50,.08);
+  }
+  .row.host .bub{background:#fff7e6;border-radius:14px 4px 14px 14px}
+  .row:last-child .bub{background:#fff}
+
+  /* ============ 结尾 ============ */
+  .ending{position:relative;z-index:1;text-align:center;padding:50px 20px 90px;max-width:640px;margin:0 auto}
+  .ending .cakewrap{width:230px;margin:0 auto 10px;position:relative;filter:drop-shadow(0 14px 22px rgba(200,160,50,.18))}
+  .ending .cakewrap img{width:100%;display:block;border-radius:14px}
+  .ending .cakewrap .glow{position:absolute;top:13%;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,rgba(255,198,104,.9),rgba(255,180,72,.32) 46%,rgba(255,170,60,0) 72%);pointer-events:none;filter:blur(2px);mix-blend-mode:screen;animation:glowPulse 1.7s ease-in-out infinite}
+  .ending .cakewrap .glow.g1{left:26%}
+  .ending .cakewrap .glow.g2{left:38%;animation-delay:.15s}
+  .ending .cakewrap .glow.g3{left:50%;animation-delay:.3s}
+  @keyframes glowPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.28)}}
+  @media (prefers-reduced-motion: reduce){.ending .cakewrap .glow{animation:none;opacity:.7}}
+  .ending h2{font-size:clamp(28px,6vw,40px);font-weight:800;color:var(--ink);margin-bottom:10px}
+  .ending p{color:var(--ink-soft);font-size:16px;max-width:440px;margin:0 auto}
+  .ending .again{margin-top:26px;padding:12px 26px;border:2px solid var(--violet);border-radius:999px;background:transparent;color:var(--violet-deep);font-weight:700;cursor:pointer;min-height:46px}
+  footer{position:relative;z-index:1;text-align:center;padding:20px;color:var(--muted);font-size:12px}
+  .ios-note{position:fixed;bottom:10px;left:0;right:0;text-align:center;color:#b3aa8e;font-size:11px;z-index:70;display:none}
+
+  @media (max-width:480px){
+    .role .ava{width:50px;height:50px}
+    .chars{gap:8px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .floaties{display:none}
+    .hero .scrollhint{animation:none}
+    .row{animation:none;opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="floaties" aria-hidden="true"></div>
+
+<button class="mute" id="muteBtn" role="switch" aria-checked="true" title="开关背景音乐">
+  <svg id="muteOnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+  <svg id="muteOffIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M11 5 6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+  <span id="muteLabel">音乐</span>
+</button>
+
+<!-- ============ 首屏：锁屏 → 播放器 ============ -->
+<header class="hero">
+  <div class="statusbar">
+    <span id="sbTime">11月2日 星期一</span>
+    <span class="icons">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8.5 15.5a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="18" r="1.4" fill="currentColor"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="17" height="10" rx="2.5"/><path d="M22 11v2"/></svg>
+    </span>
+  </div>
+
+  <!-- 锁屏视图 -->
+  <div class="lock" id="lockView">
+    <div class="clock">
+      <div class="bigdate" id="lockDate">星期一 · 11月2日</div>
+      <div class="bigtime" id="lockTime">06:22</div>
+    </div>
+    <button class="avatarBtn" id="avatarBtn" aria-label="播放生日祝福">
+      <img class="ph" src="assets/寿星头像.png" alt="易辰">
+    </button>
+    <div class="uname" id="lockName">用户：易辰</div>
+    <p class="touchhint">轻触头像，播放属于你的生日歌</p>
+  </div>
+
+  <!-- 播放器视图 -->
+  <div class="player" id="playerView">
+    <div class="vinyl" id="vinyl">
+      <div class="grooves"></div>
+      <div class="label"><img class="ph" id="vinylFace" src="assets/寿星头像.png" alt="易辰"></div>
+    </div>
+    <div class="song" id="songName">生日快乐 · 易辰</div>
+    <div class="artist">来自 14 位朋友的祝福</div>
+    <div class="lyrics" id="lyrics"><div class="lwrap" id="lyricWrap">
+      <div class="l act"><span class="zh">落下的红叶与漫漫长夜</span><span class="en">As crimson leaves fall into the night,</span></div>
+      <div class="l"><span class="zh">旅途，将去往何方？</span><span class="en">Where shall this journey lead, beyond our sight?</span></div>
+      <div class="l"><span class="zh">路上的旅人，请莫慌忙</span><span class="en">O traveler, take your time, don't fear;</span></div>
+      <div class="l"><span class="zh">就算前路布满冰霜</span><span class="en">Though frost may cloak the path ahead,</span></div>
+      <div class="l"><span class="zh">自由之风，也不会停止吹拂</span><span class="en">The winds of freedom shall not disappear.</span></div>
+      <div class="l"><span class="zh">愿你旅途坦然</span><span class="en">May your journey be peaceful and bright,</span></div>
+      <div class="l"><span class="zh">诡计永不败露</span><span class="en">And may your tricks stay hidden from sight</span></div>
+    </div></div>
+    <div class="progress">
+      <div class="bar"><i id="progBar"></i></div>
+      <div class="tms"><span id="progCur">00:00</span><span id="progDur">00:00</span></div>
+    </div>
+    <div class="controls">
+      <button class="side" id="prevBtn" aria-label="上一首">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM20 6l-10 6 10 6z"/></svg>
+      </button>
+      <button class="play" id="playBtn" aria-label="播放">
+        <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" width="26" height="26" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <button class="side" id="nextBtn" aria-label="下一首">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM4 6l10 6-10 6z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <p class="scrollhint">向下滑动，看看谁在等你</p>
+</header>
+
+<!-- ============ 场景区：群像 + 角色发微信 ============ -->
+<section class="stage" id="stage">
+  <p class="kicker">礼物已就位</p>
+  <h2>他们都在等着为你庆祝</h2>
+  <p class="sub">点一点身边的朋友，查看他们的留言</p>
+  <button class="letSpeak" id="letSpeak">让他们排队开口</button>
+
+  <div class="scene">
+    <figure class="poster">
+      <img src="assets/群像蛋糕14.jpg" alt="一群朋友围着生日蛋糕">
+      <figcaption>蛋糕前的朋友们，已经等不及要跟你说话了</figcaption>
+    </figure>
+
+    <div class="chars" id="chars">
+      <button class="role" type="button" data-name="长夜月" data-say="生日快乐，开拓者，愿你的前路，永无暗夜。"><img class="ava" src="assets/role-长夜月.jpg" alt="长夜月"><span class="nm">长夜月</span></button>
+      <button class="role" type="button" data-name="丹恒·腾荒" data-say="身为『护卫』，我会守在你前行的路上。生日快乐，开拓者。"><img class="ava" src="assets/role-丹恒腾荒.jpg" alt="丹恒·腾荒"><span class="nm">丹恒·腾荒</span></button>
+      <button class="role" type="button" data-name="派蒙" data-say="生日快乐，旅行者！派蒙会一直同你一起旅行，把美好的记忆留在每一个地方！"><img class="ava" src="assets/role-派蒙.jpg" alt="派蒙"><span class="nm">派蒙</span></button>
+      <button class="role" type="button" data-name="哥伦比娅" data-say="特别的日子，要做点特别的事…或者什么也不做，我唱歌给你听。"><img class="ava" src="assets/role-哥伦比娅.jpg" alt="哥伦比娅"><span class="nm">哥伦比娅</span></button>
+      <button class="role" type="button" data-name="菲林斯" data-say="您的实力毋庸置疑，相信您今后的旅途也会一帆风顺。"><img class="ava" src="assets/role-菲林斯.jpg" alt="菲林斯"><span class="nm">菲林斯</span></button>
+      <button class="role" type="button" data-name="阿米娅" data-say="祝您生日快乐，博士~今天我亲手做了蛋糕，希望您喜欢。今天不要工作得太累，早点休息哦。"><img class="ava" src="assets/role-阿米娅.jpg" alt="阿米娅"><span class="nm">阿米娅</span></button>
+      <button class="role" type="button" data-name="逻各斯" data-say="生日快乐，博士，这是我将祝福赠予您的第几个年头了？……有时，遗忘亦是幸福。只需记住，明年此刻我依旧会在此。"><img class="ava" src="assets/role-逻各斯.jpg" alt="逻各斯"><span class="nm">逻各斯</span></button>
+      <button class="role" type="button" data-name="佩丽卡" data-say="祝你生日快乐，管理员。终末地工业平稳运转离不开你的努力，我很开心能亲自为你庆祝生日。今年的蛋糕我有认真控制甜度，请记得尝尝看。"><img class="ava" src="assets/role-佩丽卡.jpg" alt="佩丽卡"><span class="nm">佩丽卡</span></button>
+      <button class="role" type="button" data-name="百里守约" data-say="尝尝刚出锅的点心，再去看日出吧。无论多远，子弹都会为你清除障碍。"><img class="ava" src="assets/role-百里守约.jpg" alt="百里守约"><span class="nm">百里守约</span></button>
+      <button class="role" type="button" data-name="弈星" data-say="愿你事事顺意，如白子落定成局。"><img class="ava" src="assets/role-弈星.jpg" alt="弈星"><span class="nm">弈星</span></button>
+      <button class="role" type="button" data-name="暖暖" data-say="这是我们一起度过的第十一个生日啦！很高兴在这么长时间的旅途中，我们一直是彼此最重要的伙伴~"><img class="ava" src="assets/role-暖暖.jpg" alt="暖暖"><span class="nm">暖暖</span></button>
+      <button class="role" type="button" data-name="沈星回" data-say="今天宇宙里的所有星星都在祝你生日快乐。"><img class="ava" src="assets/role-沈星回.jpg" alt="沈星回"><span class="nm">沈星回</span></button>
+      <button class="role" type="button" data-name="夏以昼" data-say="以后每年的今天，我都会寻着唯一的坐标，穿越黑暗抵达你身边。"><img class="ava" src="assets/role-夏以昼.jpg" alt="夏以昼"><span class="nm">夏以昼</span></button>
+      <button class="role" type="button" data-name="涂山苏苏" data-say="生日快乐，祝你心想事成呀！"><img class="ava" src="assets/role-涂山苏苏.jpg" alt="涂山苏苏"><span class="nm">涂山苏苏</span></button>
+    </div>
+
+    <div class="wechat">
+      <div class="wechat-head">留言板 <span class="cnt" id="msgCnt">14 条留言</span>
+        <button class="clearBtn" id="clearBtn" type="button" title="清空留言记录">清空</button>
+      </div>
+      <div class="wechat-body" id="chatBody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 结尾 ============ -->
+<section class="ending">
+  <div class="cakewrap">
+    <img src="assets/结尾蛋糕.png" alt="生日蛋糕">
+    <span class="glow g1" aria-hidden="true"></span>
+    <span class="glow g2" aria-hidden="true"></span>
+    <span class="glow g3" aria-hidden="true"></span>
+  </div>
+  <h2>感谢一路的陪伴与见证</h2>
+  <p>感谢这一年来你们的陪伴、同行与见证。<br>因为有你们，这个生日格外温暖。</p>
+  <button class="again" id="againBtn">回到开头，再听一遍</button>
+</section>
+
+<footer>给寿星的一份生日小礼物 · 14 人版</footer>
+<audio id="bgm" src="assets/肖邦a小调圆舞曲.mp3" preload="auto" loop></audio>
+<div class="ios-note" id="iosNote">iPhone 请打开侧边静音键，才能听到背景音乐</div>
+
+<script>
+/* 内部元数据（归属指纹，不影响任何逻辑） */
+const _petMeta = 'birthday-page-14|2026|一场跨越光年的宇宙旅行；晚安，辰星';
+/* ============ 占位数据：寿星 & 角色（等你提供真实信息后替换） ============ */
+const HOST = "易辰";
+const HOST_REPLY = "谢谢大家这一年来的陪伴，祝福我收到了";
+const roleEls = Array.from(document.querySelectorAll("#chars .role"));
+const CHAR_COUNT = roleEls.length;
+
+/* ============ 微信消息 ============ */
+const chatBody = document.getElementById("chatBody");
+let clockMin = 0;
+function fmtTime(){ const m = 12*60 + clockMin++; return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); }
+
+function addRoleMsg(el, text){
+  const name = el.dataset.name;
+  const ava = el.querySelector(".ava").src;
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `<img class="ava" src="${ava}" alt="${name}">
+    <div class="col"><div class="meta"><b>${name}</b><span class="tm">${fmtTime()}</span></div>
+    <div class="bub">${text}</div></div>`;
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+function addHostMsg(text){
+  const row = document.createElement("div");
+  row.className = "row host";
+  row.innerHTML = `<img class="ava" src="assets/寿星头像.png" alt="易辰">
+    <div class="col"><div class="meta"><b>用户：${HOST}</b><span class="tm">${fmtTime()}</span></div>
+    <div class="bub">${text}</div></div>`;
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+function crownSvg(){
+  return '<svg width="20" height="20" viewBox="0 0 24 24" fill="#e0a63a"><path d="M3 7l4 3 5-6 5 6 4-3v10H3V7z"/></svg>';
+}
+function markRole(el){
+  roleEls.forEach(r => r.classList.remove("speaking"));
+  if (el) el.classList.add("speaking");
+}
+
+/* 点击单个角色 → 发微信 + 朗读 */
+roleEls.forEach((el) => {
+  el.addEventListener("click", () => {
+    const say = el.dataset.say;
+    markRole(el);
+    addRoleMsg(el, say);
+    burst(innerWidth/2, el.getBoundingClientRect().top + innerHeight*0.4 - 60);
+  });
+});
+
+/* 排队开口：自动逐个发微信，中途寿星回应 */
+let autoTimer = null, autoRunning = false;
+function runAuto(){
+  if (autoRunning) return;
+  autoRunning = true;
+  document.getElementById("letSpeak").textContent = "大家正在排队说话…";
+  document.getElementById("letSpeak").disabled = true;
+  const HOST_AT = Math.floor(CHAR_COUNT / 2);
+  let i = 0;
+  function step(){
+    if (i === HOST_AT){
+      addHostMsg(HOST_REPLY);
+      i++;
+      autoTimer = setTimeout(step, 2600);
+      return;
+    }
+    if (i >= CHAR_COUNT){
+      addHostMsg("大家好不容易聚集在此，我们一起来分享这个跨越次元的蛋糕吧！");
+      burst(innerWidth/2, innerHeight*0.4);
+      autoRunning = false;
+      document.getElementById("letSpeak").textContent = "再让他们说一遍";
+      document.getElementById("letSpeak").disabled = false;
+      return;
+    }
+    const el = roleEls[i];
+    const say = el.dataset.say;
+    markRole(el);
+    addRoleMsg(el, say);
+    i++;
+    autoTimer = setTimeout(step, 2400);
+  }
+  step();
+}
+document.getElementById("letSpeak").addEventListener("click", runAuto);
+
+/* 清空留言记录 */
+document.getElementById("clearBtn").addEventListener("click", () => {
+  chatBody.innerHTML = "";
+  document.getElementById("msgCnt").textContent = "0 条留言";
+  if (autoRunning){
+    clearTimeout(autoTimer); autoTimer = null;
+    autoRunning = false;
+    document.getElementById("letSpeak").textContent = "让他们排队开口";
+    document.getElementById("letSpeak").disabled = false;
+  }
+});
+
+/* 进入场景时聚焦按钮 */
+const stageIO = new IntersectionObserver((es) => {
+  es.forEach(e => { if (e.isIntersecting){ document.getElementById("letSpeak").focus({preventScroll:true}); stageIO.disconnect(); } });
+}, { threshold: 0.4 });
+stageIO.observe(document.getElementById("stage"));
+
+/* ============ 点击彩带特效 ============ */
+const canvas = document.getElementById("fx"); const ctx = canvas.getContext("2d");
+let parts = [], running = false;
+function sizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+sizeCanvas(); addEventListener("resize", sizeCanvas);
+function burst(x, y){
+  const colors = ["#e2a83b","#f2cd76","#efaa4a","#f6c66b","#ffffff","#f7e3ac"];
+  for (let i = 0; i < 26; i++){
+    const a = Math.random()*Math.PI*2, sp = 2 + Math.random()*5;
+    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2.4,life:1,decay:.014+Math.random()*.02,size:4+Math.random()*7,color:colors[(Math.random()*colors.length)|0],rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.3});
+  }
+}
+function loop(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  parts = parts.filter(p=>p.life>0);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.vx*=.985;p.rot+=p.vr;p.life-=p.decay;
+    ctx.save();ctx.globalAlpha=Math.max(0,p.life);ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);ctx.restore();});
+  if(parts.length) requestAnimationFrame(loop); else running=false;
+}
+document.addEventListener("pointerdown", (e)=>{
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  burst(e.clientX,e.clientY);
+  if(!running){running=true;loop();}
+});
+
+/* ============ 肖邦 a 小调圆舞曲 ============ */
+const bgm = document.getElementById("bgm");
+let muted = false;
+function ensureAudio(){
+  if (bgm.paused) {
+    bgm.play().catch(()=>{
+      document.getElementById("iosNote").style.display = "block";
+    });
+  }
+}
+const muteBtn=document.getElementById("muteBtn");
+muteBtn.addEventListener("click",()=>{
+  muted=!muted;
+  bgm.muted=muted;
+  document.getElementById("muteOnIcon").style.display=muted?"none":"";
+  document.getElementById("muteOffIcon").style.display=muted?"":"none";
+  document.getElementById("muteLabel").textContent=muted?"已静音":"音乐";
+  muteBtn.setAttribute("aria-checked",String(!muted));
+});
+
+/* ============ 开始 & 回到开头 ============ */
+/* ============ 锁屏 → 播放器 ============ */
+function pad(n){return String(n).padStart(2,"0");}
+function setClock(){
+  const d = new Date();
+  const week = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+  const t = pad(d.getHours()) + ":" + pad(d.getMinutes());
+  document.getElementById("lockTime").textContent = t;
+  document.getElementById("sbTime").textContent = week[d.getDay()] + " " + (d.getMonth()+1) + "月" + d.getDate() + "日";
+  document.getElementById("lockDate").textContent = week[d.getDay()] + " · " + (d.getMonth()+1) + "月" + d.getDate() + "日";
+}
+setClock(); setInterval(setClock, 30000);
+document.getElementById("lockName").textContent = "用户：" + HOST;
+document.getElementById("songName").textContent = "生日快乐 · " + HOST;
+
+const LYRIC_LINES = Array.from(document.querySelectorAll("#lyricWrap .l"));
+const lyricsEl = document.querySelector("#lyrics");
+const LYR_STEP = 52;
+let lyricIdx = 0;
+let isPlaying = false, playTimer = null, lyricTimer = null;
+
+function fmtSec(s){ s = Math.floor(s||0); return pad(Math.floor(s/60)) + ":" + pad(s%60); }
+
+function setPlaying(on){
+  isPlaying = on;
+  document.getElementById("vinyl").classList.toggle("paused", !on);
+  document.getElementById("playIcon").style.display = on ? "none" : "";
+  document.getElementById("pauseIcon").style.display = on ? "" : "none";
+  if (on){
+    lyricTimer = setInterval(() => {
+      LYRIC_LINES.forEach(l => l.classList.remove("act"));
+      LYRIC_LINES[lyricIdx].classList.add("act");
+      lyricsEl.scrollTo({top: lyricIdx * LYR_STEP, behavior: "smooth"});
+      lyricIdx = (lyricIdx + 1) % LYRIC_LINES.length;
+    }, 9000);
+    playTimer = setInterval(() => {
+      const d = bgm.duration || 317;
+      const pct = bgm.currentTime / d * 100;
+      document.getElementById("progBar").style.width = (pct > 100 ? 100 : pct) + "%";
+      document.getElementById("progCur").textContent = fmtSec(bgm.currentTime);
+      document.getElementById("progDur").textContent = fmtSec(d);
+    }, 500);
+  } else {
+    clearInterval(lyricTimer); clearInterval(playTimer);
+    lyricTimer = playTimer = null;
+  }
+}
+
+/* 手动滑动歌词 → 暂停自动滚动，重播后恢复 */
+lyricsEl.addEventListener("touchstart", () => {
+  if (lyricTimer){ clearInterval(lyricTimer); lyricTimer = null; }
+}, {passive:true});
+
+document.getElementById("avatarBtn").addEventListener("click", () => {
+  document.getElementById("lockView").style.display = "none";
+  document.getElementById("playerView").classList.add("show");
+  ensureAudio();
+  setPlaying(true);
+  burst(innerWidth/2, innerHeight*0.4);
+});
+document.getElementById("playBtn").addEventListener("click", () => {
+  const on = !isPlaying;
+  setPlaying(on);
+  if (on) { ensureAudio(); } else { bgm.pause(); }
+});
+
+/* 音乐进度可拖动 seek */
+const progBar = document.querySelector(".progress .bar");
+function seekTo(clientX){
+  if (!bgm.duration) return;
+  const rect = progBar.getBoundingClientRect();
+  let ratio = (clientX - rect.left) / rect.width;
+  ratio = Math.max(0, Math.min(1, ratio));
+  bgm.currentTime = ratio * bgm.duration;
+  document.getElementById("progBar").style.width = (ratio * 100) + "%";
+  document.getElementById("progCur").textContent = fmtSec(bgm.currentTime);
+}
+let progDrag = false;
+progBar.addEventListener("pointerdown", (e) => {
+  progDrag = true; progBar.setPointerCapture(e.pointerId); seekTo(e.clientX);
+});
+progBar.addEventListener("pointermove", (e) => { if (progDrag) seekTo(e.clientX); });
+progBar.addEventListener("pointerup", () => { progDrag = false; });
+progBar.addEventListener("pointercancel", () => { progDrag = false; });
+
+/* 点击播放器空白处 → 回到锁屏封页 */
+function goLock(){
+  document.getElementById("playerView").classList.remove("show");
+  document.getElementById("lockView").style.display = "flex";
+  if (isPlaying) setPlaying(false);
+  bgm.pause();
+}
+document.addEventListener("click", (e) => {
+  const pv = document.getElementById("playerView");
+  if (!pv.classList.contains("show")) return;
+  if (e.target.closest(".player")) {
+    if (!e.target.closest("button, .progress, .lyrics, .vinyl, .controls, .song, .artist")) {
+      goLock();
+    }
+  }
+});
+document.getElementById("prevBtn").addEventListener("click", () => burst(innerWidth/2, innerHeight*0.4));
+document.getElementById("nextBtn").addEventListener("click", () => burst(innerWidth/2, innerHeight*0.4));
+document.getElementById("againBtn").addEventListener("click",()=>{
+  window.scrollTo({top:0,behavior:"smooth"});
+  burst(innerWidth/2,innerHeight*.5);
+});
+
+/* ============ 浮动装饰 ============ */
+(function(){
+  const box=document.querySelector(".floaties");
+  const marks=['<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18.5a3 3 0 1 1-2-2.83V6l11-2v10.5a3 3 0 1 1-2-2.83V7.2L9 8.6v9.9z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.3-9.1A4.6 4.6 0 0 1 12 6.5a4.6 4.6 0 0 1 9.3 5.4C19.5 16.4 12 21 12 21z"/></svg>'];
+  for(let i=0;i<16;i++){const s=document.createElement("span");s.innerHTML=marks[i%marks.length];
+    s.style.left=(Math.random()*100)+"vw";s.style.fontSize=(14+Math.random()*22)+"px";
+    s.style.animationDuration=(14+Math.random()*16)+"s";s.style.animationDelay=(-Math.random()*20)+"s";box.appendChild(s);}
+})();
+</script>
+</body>
+</html>
