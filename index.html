@@ -189,6 +189,8 @@
   }
   .row.host .bub{background:#fff7e6;border-radius:14px 4px 14px 14px}
   .row:last-child .bub{background:#fff}
+  .row .bub .chatimg{display:block;max-width:210px;width:100%;border-radius:10px;margin-top:5px;border:1px solid rgba(200,160,50,.12)}
+  .row .bub .imgcap{margin-top:7px;font-size:14px;line-height:1.5;color:var(--ink)}
 
   /* ============ 结尾 ============ */
   .ending{position:relative;z-index:1;text-align:center;padding:50px 20px 90px;max-width:640px;margin:0 auto}
@@ -388,13 +390,58 @@ function markRole(el){
   if (el) el.classList.add("speaking");
 }
 
-/* 点击单个角色 → 发微信 + 朗读 */
+/* 角色发图消息（图片 + 配文） */
+function addRoleImg(el, imgSrc, text){
+  const name = el.dataset.name;
+  const ava = el.querySelector(".ava").src;
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `<img class="ava" src="${ava}" alt="${name}">
+    <div class="col"><div class="meta"><b>${name}</b><span class="tm">${fmtTime()}</span></div>
+    <div class="bub"><img class="chatimg" src="${imgSrc}" alt="${name}发来的图">${text ? `<div class="imgcap">${text}</div>` : ""}</div></div>`;
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+/* 互动脚本：点击部分角色 → 先发原祝福，再发图，关联角色跟随回应 */
+const ROLE_IMG = {
+  "长夜月":   { key: "shotChg", cap: "蛋糕味道很好。" },
+  "佩丽卡":   { key: "shotPel", cap: "管理员，蛋糕的甜度刚好！" },
+  "哥伦比娅": { key: "shotCol", cap: "嗯，谢谢你的蛋糕" },
+  "暖暖":     { key: "shotNuan", cap: "我和大喵都尝到蛋糕了，最终成品好像很不错！" },
+  "涂山苏苏": { key: "shotSu", cap: "苏苏收到蛋糕了，道士哥哥也说的很好吃！" },
+  "沈星回":   { key: "shotShen", cap: "搭档，朝着星星许愿吧，它会听见你的愿望！" },
+  "夏以昼":   { key: "shotXia", cap: "生日快乐妹妹，希望你喜欢这个蛋糕！" },
+  "百里守约": { key: "shotShouyue", cap: "生日快乐召唤师！希望接下来日子里，还能继续同行。" }
+};
+const ROLE_FOLLOW = {
+  "长夜月":   [["丹恒·腾荒", "姬子姐非让我们拍照"]],
+  "佩丽卡":   [["阿米娅", "博士，蛋糕怎么样？"], ["逻各斯", "蛋糕很不错。"]],
+  "哥伦比娅": [["派蒙", "这是美味！"], ["菲林斯", "生日快乐。"]],
+  "百里守约": [["弈星", "守约大哥为你准备了蛋糕，生日快乐！还好阿离姐今天没有决定下厨..."]]
+};
+function roleByName(n){ return roleEls.find(r => r.dataset.name === n); }
+
+/* 点击单个角色 → 发微信（部分角色额外发图 + 关联角色互动） */
 roleEls.forEach((el) => {
   el.addEventListener("click", () => {
     const say = el.dataset.say;
+    const name = el.dataset.name;
     markRole(el);
     addRoleMsg(el, say);
     burst(innerWidth/2, el.getBoundingClientRect().top + innerHeight*0.4 - 60);
+    if (ROLE_IMG[name]){
+      const cfg = ROLE_IMG[name];
+      addRoleImg(el, document.getElementById(cfg.key).src, cfg.cap);
+      let delay = 1600;
+      (ROLE_FOLLOW[name] || []).forEach(([fn, ftext]) => {
+        setTimeout(() => {
+          const fel = roleByName(fn);
+          if (fel){ markRole(fel); addRoleMsg(fel, ftext); }
+        }, delay);
+        delay += 2000;
+      });
+    }
   });
 });
 
@@ -525,12 +572,7 @@ function setPlaying(on){
   document.getElementById("playIcon").style.display = on ? "none" : "";
   document.getElementById("pauseIcon").style.display = on ? "" : "none";
   if (on){
-    lyricTimer = setInterval(() => {
-      LYRIC_LINES.forEach(l => l.classList.remove("act"));
-      LYRIC_LINES[lyricIdx].classList.add("act");
-      lyricsEl.scrollTo({top: lyricIdx * LYR_STEP, behavior: "smooth"});
-      lyricIdx = (lyricIdx + 1) % LYRIC_LINES.length;
-    }, 9000);
+    startLyricAuto();
     playTimer = setInterval(() => {
       const d = bgm.duration || 317;
       const pct = bgm.currentTime / d * 100;
@@ -544,10 +586,28 @@ function setPlaying(on){
   }
 }
 
-/* 手动滑动歌词 → 暂停自动滚动，重播后恢复 */
-lyricsEl.addEventListener("touchstart", () => {
+/* 歌词 both：自动随播放滚动，手动拖动时临时暂停，松手后自动恢复 */
+let lyricResume = null;
+function startLyricAuto(){
+  if (!isPlaying || lyricTimer) return;
+  lyricTimer = setInterval(() => {
+    LYRIC_LINES.forEach(l => l.classList.remove("act"));
+    LYRIC_LINES[lyricIdx].classList.add("act");
+    lyricsEl.scrollTo({top: lyricIdx * LYR_STEP, behavior: "smooth"});
+    lyricIdx = (lyricIdx + 1) % LYRIC_LINES.length;
+  }, 9000);
+}
+function pauseLyricAuto(){
   if (lyricTimer){ clearInterval(lyricTimer); lyricTimer = null; }
-}, {passive:true});
+  if (lyricResume){ clearTimeout(lyricResume); lyricResume = null; }
+}
+function scheduleLyricResume(){
+  if (lyricResume) clearTimeout(lyricResume);
+  lyricResume = setTimeout(() => { lyricResume = null; startLyricAuto(); }, 2000);
+}
+lyricsEl.addEventListener("touchstart", pauseLyricAuto, {passive:true});
+lyricsEl.addEventListener("wheel", pauseLyricAuto, {passive:true});
+lyricsEl.addEventListener("touchend", scheduleLyricResume, {passive:true});
 
 document.getElementById("avatarBtn").addEventListener("click", () => {
   document.getElementById("lockView").style.display = "none";
@@ -615,5 +675,14 @@ document.getElementById("againBtn").addEventListener("click",()=>{
     s.style.animationDuration=(14+Math.random()*16)+"s";s.style.animationDelay=(-Math.random()*20)+"s";box.appendChild(s);}
 })();
 </script>
+<!-- 互动发图：静态引用供 JS 取 src -->
+<img src="assets/长夜月发图.jpg" id="shotChg" style="display:none" alt="">
+<img src="assets/佩丽卡发图.jpg" id="shotPel" style="display:none" alt="">
+<img src="assets/哥伦比娅发图.jpg" id="shotCol" style="display:none" alt="">
+<img src="assets/暖暖发图.jpg" id="shotNuan" style="display:none" alt="">
+<img src="assets/苏苏发图.jpg" id="shotSu" style="display:none" alt="">
+<img src="assets/沈星回发图.jpg" id="shotShen" style="display:none" alt="">
+<img src="assets/夏以昼发图.jpg" id="shotXia" style="display:none" alt="">
+<img src="assets/百里守约发图.jpg" id="shotShouyue" style="display:none" alt="">
 </body>
 </html>
